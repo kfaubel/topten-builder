@@ -2,7 +2,8 @@
 import { strict } from 'assert';
 // tslint:disable: no-console
 // lib/app.ts
-import fs = require('fs');
+//import fs = require('fs');
+import fs from 'fs';
 import stream = require('stream');
 // import { updateArrayBindingPattern } from 'typescript';
 // import util = require('util');
