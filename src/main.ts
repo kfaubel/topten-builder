@@ -24,7 +24,7 @@ async function update(logger, imageDir) {
     logger.info(`Loading ${url}`);
 
     const data:any = await googleTopTenData.getData(url, ten);
-    logger.verbose("data: " + JSON.stringify(data, undefined, 2));
+    //logger.verbose("data: " + JSON.stringify(data, undefined, 2));
 
     const imageList: any[] = [];
 
