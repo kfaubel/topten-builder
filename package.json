@@ -1,6 +1,6 @@
 {
   "name": "topten-builder",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create images with Google top ten search terms",
   "main": "index.js",
   "scripts": {
