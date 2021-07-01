@@ -2,5 +2,4 @@
 // Use app.ts for local testing and to build a stand alone solution
 
 module.exports = Object.assign({}, require('./build/GoogleTopTenData'), 
-                                   require('./build/GoogleTopTenImage'),
-                                   require('./build/Logger'));
+                                   require('./build/GoogleTopTenImage'));

@@ -1,37 +1,24 @@
-import { doesNotReject } from "assert";
-
-// tslint:disable: no-var-requires
-// tslint:disable: object-literal-sort-keys
 const fs = require('fs');
 const axios = require('axios'); 
-// const {Readable} = require('stream');
 const jpeg = require('jpeg-js');
-
-// const { createCanvas, loadImage } = require('canvas');
-// const GoogleTopTenData = require('././googletoptendata');
 const pure = require('pureimage');
-// const pureTextPath = require('pureimage/src/text.js');
-// const pureregisterFont = require('pureimage/src/text.js');
 
 const fontDir = __dirname + "/../fonts";
 
 export class GoogleTopTenImage {
     
-    private context:any;
+    private context:any; // reserved
     private logger: any;
     
     constructor(context: any, logger: any) {
-        this.context = context;
+        this.context = context; // usually null
         this.logger = logger;
     }
 
     public async saveImageStream(dataItem:any) {
-        // dataItem.number
         // dataItem.title 
         // dataItem.pictureUrl
         // dataItem.details
-
-        this.logger.info(`Rendering screen for ${dataItem.title}`);
 
         const imageHeight: number = 1080; // 800;
         const imageWidth: number = 1920; // 1280;
@@ -43,10 +30,10 @@ export class GoogleTopTenImage {
         const TitleOffsetY: number = 160;
 
         const DetailOffsetX: number = 100;
-        const DetailOffsetY: number = 320;
+        const DetailOffsetY: number = 330;
 
         const PictureX: number = 600;
-        const PictureY: number = 500;
+        const PictureY: number = 510;
         const PictureWidth: number = 400;
         const PictureHeight: number = 400;
 
@@ -85,7 +72,7 @@ export class GoogleTopTenImage {
         for (const titleLine of Object.keys(titleLines)) {
             ctx.fillStyle = textColor; 
             ctx.font = "120pt 'OpenSans-Bold'";
-            ctx.fillText(titleLines[titleLine], TitleOffsetX, TitleOffsetY);
+            ctx.fillText(titleLines[titleLine], TitleOffsetX, TitleOffsetY + (lineNumber++ * 100));
         }
 
         lineNumber = 0;
@@ -96,16 +83,8 @@ export class GoogleTopTenImage {
             ctx.font = "72pt 'alata-regular'";
             ctx.fillText(detailLines[detailLine], DetailOffsetX, DetailOffsetY + (lineNumber++ * 80));            
         }
-    
-        // await pure.encodeJPEGToStream(img, fs.createWriteStream(fileName), 50);
 
         const jpegImg = jpeg.encode(img, 50);
-        // const jpegImgStream = new Readable({
-        //     read() {
-        //       this.push(jpegImg.data);
-        //       this.push(null);
-        //     }
-        // });
 
         return {
             imageType: "jpg",
@@ -117,7 +96,7 @@ export class GoogleTopTenImage {
         const list: string[] = [];
 
         if (maxLines < 1 || maxLines > 10) {
-            this.context.log.error(`splitLine: maxLines too large (${maxLines})`)
+            this.logger.log.error(`splitLine: maxLines too large (${maxLines})`)
             return list;
         }
 

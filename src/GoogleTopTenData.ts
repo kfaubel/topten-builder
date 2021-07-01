@@ -1,8 +1,7 @@
-// tslint:disable: no-var-requires
-// tslint:disable: no-console
 let xml2js = require('xml2js');
 let axios = require('axios');
 
+// Sample from GET of the url
 //  <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 //    <rss version="2.0" xmlns:ht="http://www.google.com/trends/hottrends" xmlns:atom="http://www.w3.org/2005/Atom">
 //      <channel>
@@ -23,6 +22,7 @@ let axios = require('axios');
 //        <item>
 //          ...
 
+// Converted JSON
 // "rss": {
 //     "channel": [
 //       {
@@ -67,50 +67,36 @@ export class GoogleTopTenData {
         return outStr;
     }
 
-    // tslint:disable-next-line: member-ordering
-    public async getData(url: string, count: number) {       
-
-        this.logger.info(`getData - loading URL: ${url}`);
-        
+    public async getData(url: string, count: number) {         
         const theData: object[] = [];
 
         await axios.get(url)
             .then((response: any) => {
-                // handle success
                 const topTenData: any = response.data;
-
-                // Log the XML result
-                // console.log(topTenData);
 
                 const parser = new xml2js.Parser(/* options */);
                 parser.parseStringPromise(topTenData)
-                .then((result:any) => {
-                    // Log the converted JSON result
-                    // console.log(JSON.stringify(result, undefined, 2));
+                    .then((result: any) => {
+                        // Log the converted JSON result
+                        // this.logger.log(JSON.stringify(result, undefined, 2));
 
-                    for(let i:number = 0; i < count; i++) {
-                        const trend:any = {};
-                        trend.number  = (i+1);
-                        trend.title   = this.fixString(result.rss.channel[0].item[i].title[0]);
-                        trend.pictureUrl =                result.rss.channel[0].item[i]['ht:picture'][0];
-                        trend.details = this.fixString(result.rss.channel[0].item[i]['ht:news_item'][0]['ht:news_item_title'][0]);
-                        this.logger.info(`Item ${i} - Title: ${trend.title}`);
-
-                        theData[i] = trend;
-                    }
-                    
-                })
-                    .catch((err) => {
+                        for(let i:number = 0; i < count; i++) {
+                            const trend: any = {};
+                            trend.number = i+1;
+                            trend.title   = this.fixString(result.rss.channel[0].item[i].title[0]);
+                            trend.pictureUrl =             result.rss.channel[0].item[i]['ht:picture'][0];
+                            trend.details = this.fixString(result.rss.channel[0].item[i]['ht:news_item'][0]['ht:news_item_title'][0]);
+                            
+                            theData[i] = trend;
+                        }
+                    })
+                    .catch((err: any) => {
                         this.logger.error(err);
                     });
             })
             .catch((error: string) => {
                 this.logger.error("Error: " + error);
             })
-        
-        // Log the final result with just 'count' items and only the 3 important fields
-        // this.context.info(JSON.stringify(theData, undefined, 2));
-
         return theData;
     }
 }
