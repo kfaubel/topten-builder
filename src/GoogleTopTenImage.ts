@@ -53,9 +53,9 @@ export class GoogleTopTenImage {
         const img = pure.make(imageWidth, imageHeight);
         const ctx = img.getContext('2d');
 
-        const fntBold = pure.registerFont(fontDir + 'fonts/OpenSans-Bold.ttf','OpenSans-Bold');
-        const fntRegular = pure.registerFont(fontDir + 'fonts/OpenSans-Regular.ttf','OpenSans-Regular');
-        const fntRegular2 = pure.registerFont(fontDir + 'fonts/alata-regular.ttf','alata-regular');
+        const fntBold = pure.registerFont(fontDir + '/OpenSans-Bold.ttf','OpenSans-Bold');
+        const fntRegular = pure.registerFont(fontDir + '/OpenSans-Regular.ttf','OpenSans-Regular');
+        const fntRegular2 = pure.registerFont(fontDir + '/alata-regular.ttf','alata-regular');
 
         fntBold.loadSync();
         fntRegular.loadSync();
