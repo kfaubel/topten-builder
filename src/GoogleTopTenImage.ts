@@ -13,6 +13,8 @@ const pure = require('pureimage');
 // const pureTextPath = require('pureimage/src/text.js');
 // const pureregisterFont = require('pureimage/src/text.js');
 
+const fontDir = __dirname + "/../fonts";
+
 export class GoogleTopTenImage {
     
     private context:any;
@@ -51,9 +53,9 @@ export class GoogleTopTenImage {
         const img = pure.make(imageWidth, imageHeight);
         const ctx = img.getContext('2d');
 
-        const fntBold = pure.registerFont('fonts/OpenSans-Bold.ttf','OpenSans-Bold');
-        const fntRegular = pure.registerFont('fonts/OpenSans-Regular.ttf','OpenSans-Regular');
-        const fntRegular2 = pure.registerFont('fonts/alata-regular.ttf','alata-regular');
+        const fntBold = pure.registerFont(fontDir + 'fonts/OpenSans-Bold.ttf','OpenSans-Bold');
+        const fntRegular = pure.registerFont(fontDir + 'fonts/OpenSans-Regular.ttf','OpenSans-Regular');
+        const fntRegular2 = pure.registerFont(fontDir + 'fonts/alata-regular.ttf','alata-regular');
 
         fntBold.loadSync();
         fntRegular.loadSync();
