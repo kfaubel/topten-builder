@@ -1,49 +1,56 @@
-const fs = require('fs');
-const axios = require('axios'); 
-const jpeg = require('jpeg-js');
-const pure = require('pureimage');
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import * as fs from 'fs';
+import path from 'path';
+import axios, { AxiosResponse } from 'axios';
+import jpeg from 'jpeg-js';
+import * as pure from 'pureimage';
+import { Logger } from './Logger.js';
+import { GoogleTopTenData, TopTenItem } from './GoogleTopTenData';
 
-const fontDir = __dirname + "/../fonts";
+export interface ImageResult {
+    expires: string;
+    imageType: string;
+    imageData: jpeg.BufferRet | null;
+}
 
 export class GoogleTopTenImage {
-    
-    private context:any; // reserved
-    private logger: any;
-    
-    constructor(context: any, logger: any) {
-        this.context = context; // usually null
+    private logger: Logger;
+    private dirname: string;
+
+    constructor(logger: Logger, dirname: string) {
         this.logger = logger;
+        this.dirname = dirname;
     }
 
-    public async saveImageStream(dataItem:any) {
+    public async getImage(dataItem: TopTenItem): Promise<ImageResult> {
         // dataItem.title 
         // dataItem.pictureUrl
         // dataItem.details
 
-        const imageHeight: number = 1080; // 800;
-        const imageWidth: number = 1920; // 1280;
+        const imageHeight = 1080; 
+        const imageWidth  = 1920; 
 
-        const backgroundColor: string = 'rgb(250, 250, 250)';
-        const textColor: string = 'rgb(50, 5, 250)';
+        const backgroundColor = 'rgb(250, 250, 250)';
+        const textColor = 'rgb(50, 5, 250)';
 
-        const TitleOffsetX: number = 100;
-        const TitleOffsetY: number = 160;
+        const TitleOffsetX = 100;
+        const TitleOffsetY = 160;
 
-        const DetailOffsetX: number = 100;
-        const DetailOffsetY: number = 330;
+        const DetailOffsetX = 100;
+        const DetailOffsetY = 330;
 
-        const PictureX: number = 600;
-        const PictureY: number = 510;
-        const PictureWidth: number = 400;
-        const PictureHeight: number = 400;
+        const PictureX = 600;
+        const PictureY = 510;
+        const PictureWidth = 400;
+        const PictureHeight = 400;
 
         const img = pure.make(imageWidth, imageHeight);
         const ctx = img.getContext('2d');
 
-        const fntBold = pure.registerFont(fontDir + '/OpenSans-Bold.ttf','OpenSans-Bold');
-        const fntRegular = pure.registerFont(fontDir + '/OpenSans-Regular.ttf','OpenSans-Regular');
-        const fntRegular2 = pure.registerFont(fontDir + '/alata-regular.ttf','alata-regular');
-
+        const fntBold = pure.registerFont(path.join(this.dirname, "..", "fonts", "OpenSans-Bold.ttf"),'OpenSans-Bold');
+        const fntRegular = pure.registerFont(path.join(this.dirname, "..", "fonts", "OpenSans-Regular.ttf"),'OpenSans-Regular');
+        const fntRegular2 = pure.registerFont(path.join(this.dirname, "..", "fonts", "alata-regular.ttf"),'alata-regular');
+        
         fntBold.loadSync();
         fntRegular.loadSync();
         fntRegular2.loadSync();
@@ -53,7 +60,7 @@ export class GoogleTopTenImage {
 
         try {
             // this.logger.info("dataItem: " + JSON.stringify(dataItem, undefined, 2));
-            const response:any = await axios.get(dataItem.pictureUrl, {responseType: "stream"} );
+            const response: AxiosResponse = await axios.get(dataItem.pictureUrl as string, {responseType: "stream"} );
             const picture:any = await pure.decodeJPEGFromStream(response.data);
             await pure.encodeJPEGToStream(picture,fs.createWriteStream("picture.jpg"), 50);
             ctx.drawImage(picture,
@@ -65,28 +72,34 @@ export class GoogleTopTenImage {
         }
 
         // Draw the title
-        const title: string = `#${dataItem.number} ${dataItem.title}`
+        const title = `#${dataItem.number} ${dataItem.title}`
         const titleLines: string[] = this.splitLine(title, 25, 2);       
 
-        let lineNumber: number = 0;
-        for (const titleLine of Object.keys(titleLines)) {
+        for (let titleIndex = 0; titleIndex < titleLines.length; titleIndex++) { 
             ctx.fillStyle = textColor; 
             ctx.font = "120pt 'OpenSans-Bold'";
-            ctx.fillText(titleLines[titleLine], TitleOffsetX, TitleOffsetY + (lineNumber++ * 100));
+            ctx.fillText(titleLines[titleIndex], TitleOffsetX, TitleOffsetY + (titleIndex++ * 100));
         }
 
-        lineNumber = 0;
-        const detailLines: string[] = this.splitLine(dataItem.details, 45, 3);
+        const detailLines: string[] = this.splitLine(dataItem.details as string, 45, 3);
 
-        for (const detailLine of Object.keys(detailLines)) {
+        for (let detailIndex = 0; detailIndex < detailLines.length; detailIndex++) { 
             ctx.fillStyle = textColor; 
             ctx.font = "72pt 'alata-regular'";
-            ctx.fillText(detailLines[detailLine], DetailOffsetX, DetailOffsetY + (lineNumber++ * 80));            
+            ctx.fillText(detailLines[detailIndex], DetailOffsetX, DetailOffsetY + (detailIndex++ * 80));            
         }
 
-        const jpegImg = jpeg.encode(img, 50);
+        // Save the bitmap out to a jpeg image buffer
+        const jpegImg: jpeg.BufferRet = jpeg.encode(img, 50);
+
+        // How long is this image good for
+        const goodForMins = 60;
+
+        const expires = new Date();
+        expires.setMinutes(expires.getMinutes() + goodForMins);
 
         return {
+            expires: expires.toUTCString(),
             imageType: "jpg",
             imageData: jpegImg
         }
@@ -96,7 +109,7 @@ export class GoogleTopTenImage {
         const list: string[] = [];
 
         if (maxLines < 1 || maxLines > 10) {
-            this.logger.log.error(`splitLine: maxLines too large (${maxLines})`)
+            this.logger.error(`splitLine: maxLines too large (${maxLines})`)
             return list;
         }
 

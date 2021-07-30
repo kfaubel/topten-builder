@@ -1,5 +1,6 @@
-let xml2js = require('xml2js');
-let axios = require('axios');
+import axios, { AxiosResponse } from 'axios';
+import xml2js from 'xml2js';
+import { Logger } from './Logger.js';
 
 // Sample from GET of the url
 //  <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
@@ -48,12 +49,17 @@ let axios = require('axios');
 //     }
 // } 
 
-export class GoogleTopTenData {
-    private context: any;
-    private logger: any;
+export interface TopTenItem {
+    number?: number;
+    title?: string;
+    pictureUrl?: string;
+    details?: string;
+}
 
-    constructor(context: any, logger: any) {
-        this.context = context;
+export class GoogleTopTenData {
+    private logger: Logger;
+
+    constructor(logger: Logger) {
         this.logger = logger;
     }
 
@@ -67,36 +73,31 @@ export class GoogleTopTenData {
         return outStr;
     }
 
-    public async getData(url: string, count: number) {         
-        const theData: object[] = [];
+    public async getData(url: string, count: number): Promise<Array<TopTenItem>> {         
+        const topTenList: Array<TopTenItem> = [];
 
-        await axios.get(url)
-            .then((response: any) => {
-                const topTenData: any = response.data;
+        try {
+            const response: AxiosResponse = await axios.get(url);
+            const topTenData: any = response.data;
 
-                const parser = new xml2js.Parser(/* options */);
-                parser.parseStringPromise(topTenData)
-                    .then((result: any) => {
-                        // Log the converted JSON result
-                        // this.logger.log(JSON.stringify(result, undefined, 2));
+            const parser = new xml2js.Parser(/* options */);
+            const topTenJson: any = await parser.parseStringPromise(topTenData)
+               
+            // this.logger.log(JSON.stringify(topTenJson, undefined, 2));
 
-                        for(let i:number = 0; i < count; i++) {
-                            const trend: any = {};
-                            trend.number = i+1;
-                            trend.title   = this.fixString(result.rss.channel[0].item[i].title[0]);
-                            trend.pictureUrl =             result.rss.channel[0].item[i]['ht:picture'][0];
-                            trend.details = this.fixString(result.rss.channel[0].item[i]['ht:news_item'][0]['ht:news_item_title'][0]);
-                            
-                            theData[i] = trend;
-                        }
-                    })
-                    .catch((err: any) => {
-                        this.logger.error(err);
-                    });
-            })
-            .catch((error: string) => {
-                this.logger.error("Error: " + error);
-            })
-        return theData;
+            for(let i = 0; i < count; i++) {
+                const trend: TopTenItem = {};
+                trend.number = i+1;
+                trend.title   = this.fixString(topTenJson.rss.channel[0].item[i].title[0]);
+                trend.pictureUrl =             topTenJson.rss.channel[0].item[i]['ht:picture'][0];
+                trend.details = this.fixString(topTenJson.rss.channel[0].item[i]['ht:news_item'][0]['ht:news_item_title'][0]);
+                
+                topTenList[i] = trend;
+            }
+        } catch (e) {
+            this.logger.error("Read article data: " + e);
+        }
+        
+        return topTenList;
     }
 }
