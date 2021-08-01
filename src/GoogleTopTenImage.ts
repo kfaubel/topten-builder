@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import * as fs from 'fs';
-import path from 'path';
-import axios, { AxiosResponse } from 'axios';
-import jpeg from 'jpeg-js';
-import * as pure from 'pureimage';
-import { Logger } from './Logger.js';
-import { GoogleTopTenData, TopTenItem } from './GoogleTopTenData';
+import * as fs from "fs";
+import path from "path";
+import axios, { AxiosResponse } from "axios";
+import jpeg from "jpeg-js";
+import * as pure from "pureimage";
+import { Logger } from "./Logger.js";
+import { GoogleTopTenData, TopTenItem } from "./GoogleTopTenData";
 
 export interface ImageResult {
     expires: string;
@@ -30,8 +30,8 @@ export class GoogleTopTenImage {
         const imageHeight = 1080; 
         const imageWidth  = 1920; 
 
-        const backgroundColor = 'rgb(250, 250, 250)';
-        const textColor = 'rgb(50, 5, 250)';
+        const backgroundColor = "rgb(250, 250, 250)";
+        const textColor       = "rgb(50, 5, 250)";
 
         const TitleOffsetX = 100;
         const TitleOffsetY = 160;
@@ -45,11 +45,11 @@ export class GoogleTopTenImage {
         const PictureHeight = 400;
 
         const img = pure.make(imageWidth, imageHeight);
-        const ctx = img.getContext('2d');
+        const ctx = img.getContext("2d");
 
-        const fntBold = pure.registerFont(path.join(this.dirname, "..", "fonts", "OpenSans-Bold.ttf"),'OpenSans-Bold');
-        const fntRegular = pure.registerFont(path.join(this.dirname, "..", "fonts", "OpenSans-Regular.ttf"),'OpenSans-Regular');
-        const fntRegular2 = pure.registerFont(path.join(this.dirname, "..", "fonts", "alata-regular.ttf"),'alata-regular');
+        const fntBold     = pure.registerFont(path.join(this.dirname, "..", "fonts", "OpenSans-Bold.ttf"),   "OpenSans-Bold");
+        const fntRegular  = pure.registerFont(path.join(this.dirname, "..", "fonts", "OpenSans-Regular.ttf"),"OpenSans-Regular");
+        const fntRegular2 = pure.registerFont(path.join(this.dirname, "..", "fonts", "alata-regular.ttf"),   "alata-regular");
         
         fntBold.loadSync();
         fntRegular.loadSync();
@@ -61,6 +61,7 @@ export class GoogleTopTenImage {
         try {
             // this.logger.info("dataItem: " + JSON.stringify(dataItem, undefined, 2));
             const response: AxiosResponse = await axios.get(dataItem.pictureUrl as string, {responseType: "stream"} );
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const picture:any = await pure.decodeJPEGFromStream(response.data);
             await pure.encodeJPEGToStream(picture,fs.createWriteStream("picture.jpg"), 50);
             ctx.drawImage(picture,
@@ -72,7 +73,7 @@ export class GoogleTopTenImage {
         }
 
         // Draw the title
-        const title = `#${dataItem.number} ${dataItem.title}`
+        const title = `#${dataItem.number} ${dataItem.title}`;
         const titleLines: string[] = this.splitLine(title, 25, 2);       
 
         for (let titleIndex = 0; titleIndex < titleLines.length; titleIndex++) { 
@@ -102,14 +103,14 @@ export class GoogleTopTenImage {
             expires: expires.toUTCString(),
             imageType: "jpg",
             imageData: jpegImg
-        }
+        };
     }
 
     private splitLine(inStr: string, maxLineLength: number, maxLines: number) {
         const list: string[] = [];
 
         if (maxLines < 1 || maxLines > 10) {
-            this.logger.error(`splitLine: maxLines too large (${maxLines})`)
+            this.logger.error(`splitLine: maxLines too large (${maxLines})`);
             return list;
         }
 
@@ -121,7 +122,7 @@ export class GoogleTopTenImage {
             }
 
             breakIndex = maxLineLength - 1;
-            while (breakIndex > 0 && (inStr.charAt(breakIndex) !== ' ')) {
+            while (breakIndex > 0 && (inStr.charAt(breakIndex) !== " ")) {
                 breakIndex--;
             }
 

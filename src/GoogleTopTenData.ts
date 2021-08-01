@@ -1,6 +1,6 @@
-import axios, { AxiosResponse } from 'axios';
-import xml2js from 'xml2js';
-import { Logger } from './Logger.js';
+import axios, { AxiosResponse } from "axios";
+import xml2js from "xml2js";
+import { Logger } from "./Logger.js";
 
 // Sample from GET of the url
 //  <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
@@ -78,10 +78,12 @@ export class GoogleTopTenData {
 
         try {
             const response: AxiosResponse = await axios.get(url);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const topTenData: any = response.data;
 
             const parser = new xml2js.Parser(/* options */);
-            const topTenJson: any = await parser.parseStringPromise(topTenData)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const topTenJson: any = await parser.parseStringPromise(topTenData);
                
             // this.logger.log(JSON.stringify(topTenJson, undefined, 2));
 
@@ -89,8 +91,8 @@ export class GoogleTopTenData {
                 const trend: TopTenItem = {};
                 trend.number = i+1;
                 trend.title   = this.fixString(topTenJson.rss.channel[0].item[i].title[0]);
-                trend.pictureUrl =             topTenJson.rss.channel[0].item[i]['ht:picture'][0];
-                trend.details = this.fixString(topTenJson.rss.channel[0].item[i]['ht:news_item'][0]['ht:news_item_title'][0]);
+                trend.pictureUrl =             topTenJson.rss.channel[0].item[i]["ht:picture"][0];
+                trend.details = this.fixString(topTenJson.rss.channel[0].item[i]["ht:news_item"][0]["ht:news_item_title"][0]);
                 
                 topTenList[i] = trend;
             }
