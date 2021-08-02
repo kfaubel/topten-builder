@@ -29,7 +29,7 @@ async function update(logger: Logger, imageDir: string) {
 
             if (item !== null) {
                 const filename = `${imageDir}/googleTopTen-${i+1}.${item.imageType}`;
-                logger.verbose(`  Writing: ${filename} (${data[i].title})`);
+                logger.log(`  Writing: ${filename} (${data[i].title})`);
                 fs.writeFileSync(filename, item.imageData?.data); 
             } 
         }
