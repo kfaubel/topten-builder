@@ -22,7 +22,7 @@ export class GoogleTopTenImage {
         this.dirname = dirname;
     }
 
-    public async getImage(dataItem: TopTenItem): Promise<ImageResult> {
+    public async getImage(dataItem: TopTenItem): Promise<ImageResult | null> {
         // dataItem.title 
         // dataItem.pictureUrl
         // dataItem.details
@@ -70,6 +70,7 @@ export class GoogleTopTenImage {
             );
         } catch (e) {
             this.logger.error("Failed to read picture: " + e);
+            return null;
         }
 
         // Draw the title
