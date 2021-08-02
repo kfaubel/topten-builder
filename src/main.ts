@@ -1,6 +1,6 @@
-import fs from 'fs';
-import { GoogleTopTenData, TopTenItem } from './GoogleTopTenData';
-import { GoogleTopTenImage, ImageResult } from './GoogleTopTenImage';
+import fs from "fs";
+import { GoogleTopTenData, TopTenItem } from "./GoogleTopTenData";
+import { GoogleTopTenImage, ImageResult } from "./GoogleTopTenImage";
 import { Logger } from "./Logger";
 
 // Create a new express application instance
@@ -17,22 +17,24 @@ async function update(logger: Logger, imageDir: string) {
     //logger.verbose("data: " + JSON.stringify(data, undefined, 2));
 
     try {
-        fs.mkdirSync(imageDir, { recursive: true })
+        fs.mkdirSync(imageDir, { recursive: true });
     } catch (e) {
-        logger.error(`Failure to create directory ${imageDir} - ${e}`)
+        logger.error(`Failure to create directory ${imageDir} - ${e}`);
     }
 
-    logger.info(`Rendering images:`);
+    logger.info("Rendering images:");
     try {
         for(let i = 0; i < count; i++) {
-            const item: ImageResult = await googleTopTenImage.getImage(data[i]);
+            const item: ImageResult | null = await googleTopTenImage.getImage(data[i]);
 
-            const filename = `${imageDir}/googleTopTen-${i+1}.${item.imageType}`
-            logger.verbose(`  Writing: ${filename} (${data[i].title})`);
-            fs.writeFileSync(filename, item.imageData?.data); 
+            if (item !== null) {
+                const filename = `${imageDir}/googleTopTen-${i+1}.${item.imageType}`;
+                logger.verbose(`  Writing: ${filename} (${data[i].title})`);
+                fs.writeFileSync(filename, item.imageData?.data); 
+            } 
         }
     } catch (e) {
-        logger.error(`Failure to render and save images - ${e}`)
+        logger.error(`Failure to render and save images - ${e}`);
     }
 }
 
