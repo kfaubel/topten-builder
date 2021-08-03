@@ -1,1 +1,1 @@
-declare module "tides-builder";
+declare module "topten-builder";
