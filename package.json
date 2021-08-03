@@ -42,6 +42,8 @@
   "homepage": "https://github.com/kfaubel/topten-builder#readme",
   "files": [
     "build/**/*",
-    "fonts/**/*"
+    "fonts/**/*",
+    "index.js",
+    "index.d.ts"
   ]
 }
