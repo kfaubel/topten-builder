@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import * as fs from "fs";
 import path from "path";
 import axios, { AxiosResponse } from "axios";
 import jpeg from "jpeg-js";
 import * as pure from "pureimage";
-import { Logger } from "./Logger.js";
-import { GoogleTopTenData, TopTenItem } from "./GoogleTopTenData";
+import { LoggerInterface } from "./Logger.js";
+import { TopTenItem } from "./GoogleTopTenData";
 
 export interface ImageResult {
     expires: string;
@@ -14,12 +13,10 @@ export interface ImageResult {
 }
 
 export class GoogleTopTenImage {
-    private logger: Logger;
-    private dirname: string;
+    private logger: LoggerInterface;
 
-    constructor(logger: Logger, dirname: string) {
+    constructor(logger: LoggerInterface) {
         this.logger = logger;
-        this.dirname = dirname;
     }
 
     public async getImage(dataItem: TopTenItem): Promise<ImageResult | null> {
@@ -47,9 +44,10 @@ export class GoogleTopTenImage {
         const img = pure.make(imageWidth, imageHeight);
         const ctx = img.getContext("2d");
 
-        const fntBold     = pure.registerFont(path.join(this.dirname, "..", "fonts", "OpenSans-Bold.ttf"),   "OpenSans-Bold");
-        const fntRegular  = pure.registerFont(path.join(this.dirname, "..", "fonts", "OpenSans-Regular.ttf"),"OpenSans-Regular");
-        const fntRegular2 = pure.registerFont(path.join(this.dirname, "..", "fonts", "alata-regular.ttf"),   "alata-regular");
+        // When used as an npm package, fonts need to be installed in the top level of the main project
+        const fntBold     = pure.registerFont(path.join(".", "fonts", "OpenSans-Bold.ttf"),"OpenSans-Bold");
+        const fntRegular  = pure.registerFont(path.join(".", "fonts", "OpenSans-Regular.ttf"),"OpenSans-Regular");
+        const fntRegular2 = pure.registerFont(path.join(".", "fonts", "alata-regular.ttf"),"alata-regular");
         
         fntBold.loadSync();
         fntRegular.loadSync();
@@ -63,7 +61,7 @@ export class GoogleTopTenImage {
             const response: AxiosResponse = await axios.get(dataItem.pictureUrl as string, {responseType: "stream"} );
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const picture:any = await pure.decodeJPEGFromStream(response.data);
-            await pure.encodeJPEGToStream(picture,fs.createWriteStream("picture.jpg"), 50);
+            //await pure.encodeJPEGToStream(picture,fs.createWriteStream("picture.jpg"), 50);
             ctx.drawImage(picture,
                 0, 0, picture.width, picture.height,             // source dimensions
                 PictureX, PictureY, PictureWidth, PictureHeight  // destination dimensions

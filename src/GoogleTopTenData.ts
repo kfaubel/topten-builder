@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import xml2js from "xml2js";
-import { Logger } from "./Logger.js";
+import { LoggerInterface } from "./Logger.js";
 
 // Sample from GET of the url
 //  <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
@@ -57,9 +57,9 @@ export interface TopTenItem {
 }
 
 export class GoogleTopTenData {
-    private logger: Logger;
+    private logger: LoggerInterface;
 
-    constructor(logger: Logger) {
+    constructor(logger: LoggerInterface) {
         this.logger = logger;
     }
 
