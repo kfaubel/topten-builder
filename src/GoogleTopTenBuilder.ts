@@ -6,10 +6,6 @@ import { ImageWriterInterface } from "./SimpleImageWriter";
 import { GoogleTopTenData, TopTenItem } from "./GoogleTopTenData";
 import { GoogleTopTenImage, ImageResult } from "./GoogleTopTenImage";
 
-// export interface BaseBallBuilderParams {
-//     teamList: Array<string>;
-// }
-
 export class GoogleTopTenBuilder {
     private logger: LoggerInterface;
     private cache: KacheInterface;

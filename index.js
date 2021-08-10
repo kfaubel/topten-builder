@@ -3,4 +3,4 @@
 // Use app.ts for local testing and to build a stand alone solution
 
 const GoogleTopTenBuilder  = require("./build/GoogleTopTenBuilder");
-module.exports = { GoogleTopTenBuilder };
+module.exports = GoogleTopTenBuilder;
