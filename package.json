@@ -3,6 +3,7 @@
   "version": "1.0.12",
   "description": "Create images with Google top ten search terms",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "shx rm -rf build",
