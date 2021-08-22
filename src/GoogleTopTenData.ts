@@ -54,6 +54,8 @@ export interface TopTenItem {
     title?: string;
     pictureUrl?: string;
     details?: string;
+    pubDate?: Date;
+    source?: string;
 }
 
 export class GoogleTopTenData {
@@ -93,6 +95,9 @@ export class GoogleTopTenData {
                 trend.title   = this.fixString(topTenJson.rss.channel[0].item[i].title[0]);
                 trend.pictureUrl =             topTenJson.rss.channel[0].item[i]["ht:picture"][0];
                 trend.details = this.fixString(topTenJson.rss.channel[0].item[i]["ht:news_item"][0]["ht:news_item_title"][0]);
+                trend.source  = this.fixString(topTenJson.rss.channel[0].item[i]["ht:news_item"][0]["ht:news_item_source"][0]);
+                //trend.pubDateStr =             topTenJson.rss.channel[0].item[i]["pubDate"][0];
+                trend.pubDate = new Date(topTenJson.rss.channel[0].item[i]["pubDate"][0]);
                 
                 topTenList[i] = trend;
             }
