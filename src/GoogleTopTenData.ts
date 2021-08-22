@@ -79,7 +79,7 @@ export class GoogleTopTenData {
         const topTenList: Array<TopTenItem> = [];
 
         try {
-            const response: AxiosResponse = await axios.get(url);
+            const response: AxiosResponse = await axios.get(url, {timeout: 10000});
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const topTenData: any = response.data;
 
