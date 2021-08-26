@@ -19,6 +19,24 @@ export class GoogleTopTenImage {
         this.logger = logger;
     }
 
+    // This optimized fillRect was derived from the pureimage source code: https://github.com/joshmarinacci/node-pureimage/tree/master/src
+    // To fill a 1920x1080 image on a core i5, this saves about 1.5 seconds
+    // x, y       - position of the rect
+    // w, h       - size of the rect
+    // iw         - width of the image being written into, needed to calculate index into the buffer
+    // r, g, b, a - values to draw
+    private myFillRect(image: Buffer, x: number, y: number, w: number, h: number, iw: number, r: number, g: number, b: number, a: number) {
+        for(let i = y; i < y + h; i++) {                
+            for(let j = x; j < x + w; j++) {   
+                const index = (i * iw + j) * 4;     
+                image[index + 0] = r; 
+                image[index + 1] = g; 
+                image[index + 2] = b; 
+                image[index + 3] = a; 
+            }
+        }
+    }
+
     public async getImage(dataItem: TopTenItem): Promise<ImageResult | null> {
         // dataItem.title 
         // dataItem.pictureUrl
@@ -66,7 +84,8 @@ export class GoogleTopTenImage {
         const creditFont    = "24pt 'OpenSans-Bold'";
 
         ctx.fillStyle = backgroundColor; 
-        ctx.fillRect(0,0,imageWidth, imageHeight);
+        //ctx.fillRect(0,0,imageWidth, imageHeight);
+        this.myFillRect(img.data, 0, 0, imageWidth, imageHeight, imageWidth, 0xF0, 0xF0, 0xF0, 0);
 
         try {
             // this.logger.info("dataItem: " + JSON.stringify(dataItem, undefined, 2));
