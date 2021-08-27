@@ -92,14 +92,17 @@ export class GoogleTopTenData {
             for(let i = 0; i < count; i++) {
                 const trend: TopTenItem = {};
                 trend.number = i+1;
-                trend.title   = this.fixString(topTenJson.rss.channel[0].item[i].title[0]);
-                trend.pictureUrl =             topTenJson.rss.channel[0].item[i]["ht:picture"][0];
-                trend.details = this.fixString(topTenJson.rss.channel[0].item[i]["ht:news_item"][0]["ht:news_item_title"][0]);
-                trend.source  = this.fixString(topTenJson.rss.channel[0].item[i]["ht:news_item"][0]["ht:news_item_source"][0]);
-                //trend.pubDateStr =             topTenJson.rss.channel[0].item[i]["pubDate"][0];
-                trend.pubDate = new Date(topTenJson.rss.channel[0].item[i]["pubDate"][0]);
-                
-                topTenList[i] = trend;
+                try {
+                    trend.title   = this.fixString(topTenJson.rss.channel[0].item[i].title[0]);
+                    trend.pictureUrl =             topTenJson.rss.channel[0].item[i]["ht:picture"][0];
+                    trend.details = this.fixString(topTenJson.rss.channel[0].item[i]["ht:news_item"][0]["ht:news_item_title"][0]);
+                    trend.source  = this.fixString(topTenJson.rss.channel[0].item[i]["ht:news_item"][0]["ht:news_item_source"][0]);
+                    trend.pubDate = new Date(topTenJson.rss.channel[0].item[i]["pubDate"][0]);
+
+                    topTenList[i] = trend;
+                } catch (e) {
+                    this.logger.log(`getData: elements are missing for trend ${i+1}`);
+                }
             }
         } catch (e) {
             this.logger.error("Read article data: " + e);

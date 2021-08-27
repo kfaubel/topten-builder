@@ -31,7 +31,10 @@ export class GoogleTopTenBuilder {
 
             this.logger.info("Rendering images:");
             try {
-                for(let i = 0; i < count; i++) {
+                for(let i = 0; i < data.length; i++) {
+                    if (data[i] === undefined)
+                        continue;
+                        
                     const item: ImageResult | null = await googleTopTenImage.getImage(data[i]);
 
                     if (item !== null && item.imageData !== null) {
