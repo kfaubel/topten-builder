@@ -67,14 +67,12 @@ export class GoogleTopTenData {
     }
 
     private fixString(inStr: string): string {
-        this.logger.info(`fixString: in:  ${inStr}`);
         let outStr = he.decode(inStr);
         
         outStr = outStr.replace(/<b>/g, "");
         outStr = outStr.replace(/<\/b>/g, "");
         outStr = outStr.replace(/<em>/g, "");
         outStr = outStr.replace(/<\/em>/g, "");
-        this.logger.info(`fixString: out: ${outStr}`);
         
         return outStr;
     }
