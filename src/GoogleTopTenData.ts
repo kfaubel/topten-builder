@@ -67,15 +67,16 @@ export class GoogleTopTenData {
     }
 
     private fixString(inStr: string): string {
-        
-        let outStr = inStr;
+        this.logger.info(`fixString: in:  ${inStr}`);
+        let outStr = he.decode(inStr);
         
         outStr = outStr.replace(/<b>/g, "");
         outStr = outStr.replace(/<\/b>/g, "");
         outStr = outStr.replace(/<em>/g, "");
         outStr = outStr.replace(/<\/em>/g, "");
+        this.logger.info(`fixString: out: ${outStr}`);
         
-        return he.decode(outStr);
+        return outStr;
     }
 
     public async getData(url: string, count: number): Promise<Array<TopTenItem>> {         
