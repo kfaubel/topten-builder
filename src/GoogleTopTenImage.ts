@@ -4,7 +4,9 @@ import axios, { AxiosResponse } from "axios";
 import jpeg from "jpeg-js";
 import * as pure from "pureimage";
 import { LoggerInterface } from "./Logger.js";
+import { KacheInterface } from "./Kache.js";
 import { TopTenItem } from "./GoogleTopTenData";
+import { ImageLibrary, MyImageType } from "./ImageLibrary.js";
 
 export interface ImageResult {
     expires: string;
@@ -14,9 +16,13 @@ export interface ImageResult {
 
 export class GoogleTopTenImage {
     private logger: LoggerInterface;
+    private cache: KacheInterface;
+    private imageLibrary: ImageLibrary;
 
-    constructor(logger: LoggerInterface) {
+    constructor(logger: LoggerInterface, cache: KacheInterface) {
         this.logger = logger;
+        this.cache = cache;
+        this.imageLibrary = new ImageLibrary(logger, cache);
     }
 
     // This optimized fillRect was derived from the pureimage source code: https://github.com/joshmarinacci/node-pureimage/tree/master/src
@@ -87,12 +93,23 @@ export class GoogleTopTenImage {
         //ctx.fillRect(0,0,imageWidth, imageHeight);
         this.myFillRect(img.data, 0, 0, imageWidth, imageHeight, imageWidth, 0xF0, 0xF0, 0xF0, 0);
 
+
+
         try {
-            // this.logger.info("dataItem: " + JSON.stringify(dataItem, undefined, 2));
-            const response: AxiosResponse = await axios.get(dataItem.pictureUrl as string, {responseType: "stream"} );
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const picture:any = await pure.decodeJPEGFromStream(response.data);
-            //await pure.encodeJPEGToStream(picture,fs.createWriteStream("picture.jpg"), 50);
+
+            let picture: MyImageType | null = null; 
+
+            if (typeof dataItem.pictureUrl === "string" && dataItem.pictureUrl !== "") {
+                picture = await this.imageLibrary.getImage(dataItem.pictureUrl, PictureHeight);
+            } else {
+                this.logger.warn(`getImage: Invalid image URL for ${dataItem.title}`);
+                picture = null;
+            }
+
+            if (picture === null) {
+                return null;
+            }
+
             ctx.drawImage(picture,
                 0, 0, picture.width, picture.height,             // source dimensions
                 PictureX, PictureY, PictureWidth, PictureHeight  // destination dimensions
@@ -147,6 +164,7 @@ export class GoogleTopTenImage {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private splitLine(inStr: string, ctx: any, maxPixelLength: number, maxLines: number) {
         const list: string[] = [];
 

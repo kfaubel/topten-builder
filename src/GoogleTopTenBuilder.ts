@@ -22,7 +22,7 @@ export class GoogleTopTenBuilder {
     public async CreateImages(): Promise<boolean>{
         try {
             const googleTopTenData = new GoogleTopTenData(this.logger);
-            const googleTopTenImage: GoogleTopTenImage = new GoogleTopTenImage(this.logger);
+            const googleTopTenImage: GoogleTopTenImage = new GoogleTopTenImage(this.logger, this.cache);
             const url = "https://www.google.com/trends/hottrends/atom/feed?pn=p1"; 
             this.logger.info(`Retrieving data from: ${url}`);
             const count = 10;
