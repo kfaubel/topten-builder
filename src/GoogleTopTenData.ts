@@ -1,4 +1,6 @@
 import axios, { AxiosResponse } from "axios";
+import { AxiosError } from "axios";
+import { AxiosRequestConfig } from "axios";
 import he from "he";
 import xml2js from "xml2js";
 import { LoggerInterface } from "./Logger.js";
@@ -81,15 +83,32 @@ export class GoogleTopTenData {
         const topTenList: Array<TopTenItem> = [];
 
         try {
-            const response: AxiosResponse = await axios.get(url, {timeout: 10000});
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const topTenData: any = response.data;
+            let topTenData: string | null = null;
+            const options: AxiosRequestConfig = {
+                headers: {
+                    "Content-Encoding": "gzip"
+                },
+                timeout: 20000
+            };
 
+            const startTime = new Date();
+            await axios.get(url, options)
+                .then((response: AxiosResponse) => {
+                    if (typeof process.env.TRACK_GET_TIMES !== "undefined" ) {
+                        this.logger.info(`GoogleTopTenData: GET TIME: ${new Date().getTime() - startTime.getTime()}ms`);
+                    }
+                    topTenData = response.data;
+                })
+                .catch((error: AxiosError) => {
+                    this.logger.warn(`GoogleTopTenData: GET error: ${error}`);
+                }); 
+
+            if (topTenData === null) {
+                return topTenList; // empty
+            }
             const parser = new xml2js.Parser(/* options */);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const topTenJson: any = await parser.parseStringPromise(topTenData);
-               
-            // this.logger.log(JSON.stringify(topTenJson, undefined, 2));
 
             for(let i = 0; i < count; i++) {
                 const trend: TopTenItem = {};
@@ -103,11 +122,11 @@ export class GoogleTopTenData {
 
                     topTenList[i] = trend;
                 } catch (e) {
-                    this.logger.log(`getData: elements are missing for trend ${i+1}`);
+                    this.logger.log(`GoogleTopTenData: elements are missing for trend ${i+1}`);
                 }
             }
         } catch (e) {
-            this.logger.error("Read article data: " + e);
+            this.logger.error("GoogleTopTenData: Read article data: " + e);
         }
         
         return topTenList;
