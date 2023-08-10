@@ -5,9 +5,12 @@ import { Logger } from "./Logger";
 import { SimpleImageWriter } from "./SimpleImageWriter";
 
 async function run() {
+    const imageDir = "images";
+    fs.rmSync(imageDir, { recursive: true, force: true });
+
     const logger: Logger = new Logger("topten-builder", "verbose");
     const cache: Kache = new Kache(logger, "topten-cache.json"); 
-    const simpleImageWriter: SimpleImageWriter = new SimpleImageWriter(logger, "images");
+    const simpleImageWriter: SimpleImageWriter = new SimpleImageWriter(logger, imageDir);
     const topTenBuilder: GoogleTopTenBuilder = new GoogleTopTenBuilder(logger, cache, simpleImageWriter);
    
     const success: boolean = await topTenBuilder.CreateImages();

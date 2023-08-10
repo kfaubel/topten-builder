@@ -5,6 +5,7 @@ import { KacheInterface } from "./Kache";
 import { ImageWriterInterface } from "./SimpleImageWriter";
 import { GoogleTopTenData, TopTenItem } from "./GoogleTopTenData";
 import { GoogleTopTenImage, ImageResult } from "./GoogleTopTenImage";
+import { log } from "console";
 
 export class GoogleTopTenBuilder {
     private logger: LoggerInterface;
@@ -32,16 +33,16 @@ export class GoogleTopTenBuilder {
             this.logger.info("Rendering images:");
             try {
                 for(let i = 0; i < data.length; i++) {
+                    let imageNumberStr = `00${i+1}`; // 01 .. 10 
+                    imageNumberStr = imageNumberStr.substring(imageNumberStr.length - 2); // take the last 2 digits
+                    const filename = `googleTopTen-${imageNumberStr}.jpg`;
+
                     if (data[i] === undefined)
                         continue;
                         
                     const item: ImageResult | null = await googleTopTenImage.getImage(data[i]);
 
                     if (item !== null && item.imageData !== null) {
-                        let imageNumberStr = `00${i+1}`; // 01 .. 10
-                        imageNumberStr = imageNumberStr.substr(-2, 2); // take the last 2 digits
-
-                        const filename = `googleTopTen-${imageNumberStr}.${item.imageType}`;
                         this.logger.log(`  Writing: ${filename} (${data[i].title})`);
                         this.writer.saveFile(filename, item.imageData?.data); 
                     } 
