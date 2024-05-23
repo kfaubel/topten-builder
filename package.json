@@ -1,6 +1,6 @@
 {
   "name": "topten-builder",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Create images with Google top ten search terms",
   "main": "index.js",
   "types": "index.d.ts",
@@ -28,7 +28,6 @@
     "@types/pngjs": "^6.0.1",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
-    "eslint": "^8.46.0",
     "np": "^8.0.4",
     "prettier": "^3.0.1",
     "shx": "^0.3.4",

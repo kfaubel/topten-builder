@@ -28,30 +28,35 @@ export class GoogleTopTenBuilder {
             this.logger.info(`Retrieving data from: ${url}`);
             const count = 10;
 
-            const data: Array<TopTenItem> = await googleTopTenData.getData(url, count);
+            const data: Array<TopTenItem> | null = await googleTopTenData.getData(url, count);
+            if (data === null) {
+                this.logger.error("Failed to retrieve data from Google");
+                return false;
+            }
 
             this.logger.info("Rendering images:");
-            try {
-                for(let i = 0; i < data.length; i++) {
-                    let imageNumberStr = `00${i+1}`; // 01 .. 10 
-                    imageNumberStr = imageNumberStr.substring(imageNumberStr.length - 2); // take the last 2 digits
-                    const filename = `googleTopTen-${imageNumberStr}.jpg`;
+            
+            for(let i = 0; i < data.length; i++) {
+                let imageNumberStr = `00${i+1}`; // 01 .. 10 
+                imageNumberStr = imageNumberStr.substring(imageNumberStr.length - 2); // take the last 2 digits
+                const filename = `googleTopTen-${imageNumberStr}.jpg`;
 
-                    if (data[i] === undefined)
-                        continue;
-                        
-                    const item: ImageResult | null = await googleTopTenImage.getImage(data[i]);
+                this.writer.deleteFile(filename);
 
-                    if (item !== null && item.imageData !== null) {
-                        this.logger.log(`  Writing: ${filename} (${data[i].title})`);
-                        this.writer.saveFile(filename, item.imageData?.data); 
-                    } 
-                }
-            } catch (e) {
-                this.logger.error(`Failure to render and save images - ${e}`);
+                if (data[i] === undefined)
+                    continue;
+                    
+                const item: ImageResult | null = await googleTopTenImage.getImage(data[i]);
+
+                if (item !== null && item.imageData !== null) {
+                    this.logger.log(`  Writing: ${filename} (${data[i].title})`);
+                    this.writer.saveFile(filename, item.imageData?.data); 
+                } 
             }
-        } catch (e) {
-            this.logger.error(`CreateImages: Exception: ${e}`);
+            
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            this.logger.error(`CreateImages: Exception: ${e.stack}`);
             return false;
         }
 

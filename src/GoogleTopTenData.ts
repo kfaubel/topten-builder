@@ -79,7 +79,7 @@ export class GoogleTopTenData {
         return outStr;
     }
 
-    public async getData(url: string, count: number): Promise<Array<TopTenItem>> {         
+    public async getData(url: string, count: number): Promise<Array<TopTenItem> | null> {         
         const topTenList: Array<TopTenItem> = [];
 
         try {
@@ -104,8 +104,9 @@ export class GoogleTopTenData {
                 }); 
 
             if (topTenData === null) {
-                return topTenList; // empty
+                return null;
             }
+            
             const parser = new xml2js.Parser(/* options */);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const topTenJson: any = await parser.parseStringPromise(topTenData);
